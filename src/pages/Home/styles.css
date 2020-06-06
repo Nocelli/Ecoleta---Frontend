@@ -1,7 +1,6 @@
 #page-home {
     height: 100vh;
-  
-    background: url('../../assets/home-background.svg') no-repeat 700px bottom;
+    background: url('../../assets/home-background.svg') no-repeat 500px bottom;
   }
   
   #page-home .content {
@@ -18,6 +17,21 @@
   
   #page-home .content header {
     margin: 48px 0 0;
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+
+  #page-home .content header a{
+    margin-left: 40vw;
+    display: flex;
+    text-decoration: none;
+    line-height: 24px;
+  }
+
+  #page-home .content header a span{
+    margin-right: 12px;
+    font-size: 24px;
   }
   
   #page-home .content main {
