@@ -6,6 +6,8 @@ import { LeafletMouseEvent } from 'leaflet'
 import api from '../../services/api'
 import axios from 'axios'
 
+import Dropzone from '../../components/DropZone'
+
 import logo from '../../assets/logo.svg'
 import './styles.css'
 
@@ -37,6 +39,8 @@ const CreatePoint = () => {
     const [selectedCity, setSelectedCity] = useState<string>('0')
     const [initialPosition, setInitialPosition] = useState<[number, number]>()
     const [selectedPosition, setSelectedPosition] = useState<[number, number]>([0, 0])
+    const [selectedFile, setSelectedFile] = useState<File>()
+
     const history = useHistory()
 
 
@@ -103,8 +107,8 @@ const CreatePoint = () => {
 
     function handleSelectItem(id: number) {
         const alreadySelected = selectedItems.findIndex(item => item === id)
-        
-        if(alreadySelected < 0){
+
+        if (alreadySelected < 0) {
             setSelectedItems([...selectedItems, id])
             return
         }
@@ -112,25 +116,28 @@ const CreatePoint = () => {
         setSelectedItems(selectedItems.filter(item => item !== id))
     }
 
-    async function handleSubmit(event: FormEvent){
+    async function handleSubmit(event: FormEvent) {
         event.preventDefault()
 
-        const {name, email, whatsapp} = formData
+        if(!selectedFile)
+            return
+
+        const { name, email, whatsapp } = formData
         const uf = selectedUf
         const city = selectedCity
-        const [lat,lon] = selectedPosition
+        const [lat, lon] = selectedPosition
         const items = selectedItems
 
-        const data = {
-            name,
-            whatsapp,
-            email,
-            uf,
-            city,
-            lat,
-            lon,
-            items
-        }
+        const data = new FormData()
+        data.append('name', name)
+        data.append('whatsapp', whatsapp)
+        data.append('email', email)
+        data.append('uf', uf)
+        data.append('city', city)
+        data.append('lat', String(lat))
+        data.append('lon', String(lon))
+        data.append('items', items.join(','))
+        data.append('image', selectedFile)
 
         await api.post('points', data)
         history.push('/')
@@ -148,6 +155,8 @@ const CreatePoint = () => {
             </header>
             <form onSubmit={handleSubmit}>
                 <h1>Cadastro do <br /> ponto de coleta</h1>
+
+                <Dropzone onFileUploaded={setSelectedFile} />
 
                 <fieldset>
                     <legend>
@@ -243,7 +252,7 @@ const CreatePoint = () => {
                                 key={item.id}
                                 onClick={() => handleSelectItem(item.id)}
                                 className={selectedItems.includes(item.id) ? 'selected' : ''}
-                                >
+                            >
                                 <img src={item.image_url} alt={item.title} />
                                 <span>{item.title}</span>
                             </li>
